@@ -3,9 +3,16 @@ import App from './App.tsx'
 import './index.css'
 import { Provider } from 'react-redux'
 import { store } from './store/store.ts'
+import { CssBaseline } from '@mui/material';
+
+// import { ThemeProvider } from '@mui/material/styles';
+// import theme from './theme';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
+    {/* <ThemeProvider theme={theme}> */}
+    <CssBaseline />
     <App />
+    {/* </ThemeProvider> */}
   </ Provider>
 )
