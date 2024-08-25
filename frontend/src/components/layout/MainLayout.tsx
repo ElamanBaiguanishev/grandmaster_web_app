@@ -1,35 +1,27 @@
 import { Outlet } from "react-router-dom";
-import { Box, Toolbar } from "@mui/material";
-import colorConfigs from "../../configs/colorConfigs";
-import sizeConfigs from "../../configs/sizeConfigs";
+import { Box } from "@mui/material";
 import Topbar from "../common/Topbar";
 import SideBarFC from "../sidebar/SideBar";
+import { FC } from "react";
 
-const MainLayout = () => {
+const MainLayout: FC = () => {
   return (
-    <Box sx={{ display: "flex" }}>
-      <Topbar />
+    <Box sx={{ display: "flex", height: "100vh" }}>
       <Box
         component="nav"
-        sx={{
-          width: sizeConfigs.sidebar.width,
-          flexShrink: 0
-        }}
+        sx={{ flexShrink: 0 }}
       >
         <SideBarFC />
       </Box>
       <Box
         component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: `calc(100% - ${sizeConfigs.sidebar.width})`,
-          minHeight: "100vh",
-          backgroundColor: colorConfigs.mainBg
-        }}
+        sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
       >
-        <Toolbar />
-        <Outlet />
+        <Topbar />
+        {/* <Toolbar /> */}
+        <Box sx={{ flexGrow: 1, p: 2 }}>
+          <Outlet />
+        </Box>
       </Box>
     </Box>
   );

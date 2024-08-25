@@ -1,20 +1,22 @@
-import { AppBar, Toolbar, Typography } from "@mui/material";
-import colorConfigs from "../../configs/colorConfigs";
-import sizeConfigs from "../../configs/sizeConfigs";
+import { AppBar, Toolbar, Typography, IconButton } from "@mui/material";
+import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import { useDispatch } from 'react-redux';
+import { toggleSidebar } from "../../store/sidebar/sidebarSlice";
+import { useAppSelector } from "../../store/hooks";
+import { FC } from "react";
 
-const Topbar = () => {
+const Topbar: FC = () => {
+  const dispatch = useDispatch();
+  const { isBroken } = useAppSelector((state) => state.sidebar);
+
   return (
-    <AppBar
-      position="fixed"
-      sx={{
-        width: `calc(100% - ${sizeConfigs.sidebar.width})`,
-        ml: sizeConfigs.sidebar.width,
-        boxShadow: "unset",
-        backgroundColor: colorConfigs.topbar.bg,
-        color: colorConfigs.topbar.color
-      }}
-    >
+    <AppBar position="static" sx={{ zIndex: 1201 }}>
       <Toolbar>
+        {isBroken && (
+          <IconButton onClick={() => dispatch(toggleSidebar())}>
+            <MenuOutlinedIcon />
+          </IconButton>
+        )}
         <Typography variant="h6">
           React sidebar with dropdown
         </Typography>
@@ -22,5 +24,6 @@ const Topbar = () => {
     </AppBar>
   );
 };
+
 
 export default Topbar;
