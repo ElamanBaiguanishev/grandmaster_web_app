@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSemesterDto } from './dto/create-semester.dto';
 import { UpdateSemesterDto } from './dto/update-semester.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,24 +12,44 @@ export class SemestersService {
     @InjectRepository(Semester)
     private readonly semesterRepository: Repository<Semester>
   ) { }
-  
-  create(createSemesterDto: CreateSemesterDto) {
-    return 'This action adds a new semester';
+
+  async create(createSemesterDto: CreateSemesterDto) {
+    const newSemester = {
+      name: createSemesterDto.name,
+      course: { id: +createSemesterDto.courseId }
+    }
+
+    if (!newSemester) throw new BadRequestException('Somethins went wrong')
+
+    return await this.semesterRepository.save(newSemester);
   }
 
-  findAll() {
-    return `This action returns all semesters`;
+  async findAll() {
+    return await this.semesterRepository.find({ relations: ['course', 'groups'] });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} semester`;
+  async findOne(id: number) {
+    const semester = await this.semesterRepository.findOne({
+      where: { id },
+      relations: ['course', 'groups'],
+    });
+    if (!semester) {
+      throw new NotFoundException(`Semester with id ${id} not found`);
+    }
+    return semester;
   }
 
-  update(id: number, updateSemesterDto: UpdateSemesterDto) {
-    return `This action updates a #${id} semester`;
+  async update(id: number, updateSemesterDto: UpdateSemesterDto) {
+    const semester = await this.findOne(id);
+
+    semester.name = updateSemesterDto.name;
+    semester.course.id = updateSemesterDto.courseId;
+
+    return await this.semesterRepository.save(semester);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} semester`;
+  async remove(id: number) {
+    const semester = await this.findOne(id);
+    await this.semesterRepository.remove(semester);
   }
 }
