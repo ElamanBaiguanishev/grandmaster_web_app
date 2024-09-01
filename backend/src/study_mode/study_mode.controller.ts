@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
 import { StudyModeService } from './study_mode.service';
 import { CreateStudyModeDto } from './dto/create-study_mode.dto';
 import { UpdateStudyModeDto } from './dto/update-study_mode.dto';
 
-@Controller('study-mode')
+@UsePipes(ValidationPipe)
+@Controller('studymodes')
 export class StudyModeController {
   constructor(private readonly studyModeService: StudyModeService) {}
 

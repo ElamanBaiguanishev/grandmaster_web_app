@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateStudyModeDto } from './dto/create-study_mode.dto';
 import { UpdateStudyModeDto } from './dto/update-study_mode.dto';
 import { StudyMode } from './entities/study_mode.entity';
@@ -9,26 +9,34 @@ import { Repository } from 'typeorm';
 export class StudyModeService {
   constructor(
     @InjectRepository(StudyMode)
-    private readonly studymodeRepository: Repository<StudyMode>
+    private readonly studyModeRepository: Repository<StudyMode>,
   ) { }
 
-  async create(createStudyModeDto: CreateStudyModeDto) {
-    return await this.studymodeRepository.save(createStudyModeDto)
+  async create(createStudyModeDto: CreateStudyModeDto): Promise<StudyMode> {
+    const studyMode = this.studyModeRepository.create(createStudyModeDto);
+    return await this.studyModeRepository.save(studyMode);
   }
 
-  findAll() {
-    return `This action returns all studyMode`;
+  async findAll(): Promise<StudyMode[]> {
+    return await this.studyModeRepository.find({ relations: ['courses'] });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} studyMode`;
+  async findOne(id: number): Promise<StudyMode> {
+    const studyMode = await this.studyModeRepository.findOne({ where: { id }, relations: ['courses'] });
+    if (!studyMode) {
+      throw new NotFoundException(`StudyMode with id ${id} not found`);
+    }
+    return studyMode;
   }
 
-  update(id: number, updateStudyModeDto: UpdateStudyModeDto) {
-    return `This action updates a #${id} studyMode`;
+  async update(id: number, updateStudyModeDto: UpdateStudyModeDto): Promise<StudyMode> {
+    const studyMode = await this.findOne(id);
+    this.studyModeRepository.merge(studyMode, updateStudyModeDto);
+    return await this.studyModeRepository.save(studyMode);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} studyMode`;
+  async remove(id: number): Promise<void> {
+    const studyMode = await this.findOne(id);
+    await this.studyModeRepository.remove(studyMode);
   }
 }
