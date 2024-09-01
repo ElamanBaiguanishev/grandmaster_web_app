@@ -7,6 +7,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import ShowChartOutlinedIcon from "@mui/icons-material/ShowChartOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import { NavLink } from "react-router-dom";
 
 import { FC } from 'react';
 import { tokens } from '../../theme';
@@ -22,35 +23,32 @@ const SideBarFC: FC = () => {
     const colors = tokens(theme.palette.mode);
 
     return (
-        <Box sx={{
-            position: "sticky",
-            display: "flex",
-            height: "100vh",
-            top: 0,
-            bottom: 0,
-            zIndex: 10000,
-            "& .sidebar": {
-                border: "none",
-            },
-            "& .menu-icon": {
-                backgroundColor: "transparent !important",
-            },
-            "& .menu-item": {
-                backgroundColor: "transparent !important",
-            },
-            "& .menu-anchor": {
-                color: "inherit !important",
-                backgroundColor: "transparent !important",
-            },
-            "& .menu-item:hover": {
-                color: `${colors.blueAccent[500]} !important`,
-                backgroundColor: "transparent !important",
-            },
-            "& .menu-item.active": {
-                color: `${colors.greenAccent[500]} !important`,
-                backgroundColor: "transparent !important",
-            },
-        }}>
+        <Box
+            sx={{
+                position: "sticky",
+                display: "flex",
+                height: "100vh",
+                top: 0,
+                bottom: 0,
+                zIndex: 10000,
+
+                "a": {
+                    color: "white",
+                    textDecoration: "None"
+                },
+                "& .ps-menu-button:hover": {
+                    color: `${colors.blueAccent[500]} !important`,
+                    backgroundColor: "transparent !important",
+                },
+                "& .ps-menu-button.active": {
+                    color: `${colors.greenAccent[500]} !important`,
+                    backgroundColor: "transparent !important",
+                },
+                "& .ps-submenu-content": {
+                    backgroundColor: `${colors.primary[400]} !important`
+                }
+            }}
+        >
             <Sidebar
                 collapsed={isCollapsed}
                 toggled={isToggled}
@@ -61,6 +59,7 @@ const SideBarFC: FC = () => {
             >
                 <Menu>
                     <MenuItem
+                        color={colors.grey[100]}
                         icon={
                             isCollapsed ? (
                                 <MenuOutlinedIcon onClick={() => dispatch(setIsCollapsed(false))} />
@@ -71,18 +70,60 @@ const SideBarFC: FC = () => {
                     >
                         {!isCollapsed && (
                             <Box display="flex" justifyContent="space-between" alignItems="center" ml="15px">
-                                <Typography variant="h3" color={colors.grey[100]}>
-                                    ADMINIS
+                                <Typography variant="h3"
+                                    color={colors.grey[100]}
+                                >Админ панель
                                 </Typography>
                             </Box>
                         )}
                     </MenuItem>
-                    <SubMenu label="Charts" icon={<TimelineOutlinedIcon />}>
-                        <MenuItem icon={<PieChartOutlineOutlinedIcon />}> Pie charts </MenuItem>
-                        <MenuItem icon={<ShowChartOutlinedIcon />}> Line charts </MenuItem>
+                    <SubMenu label="Редактор" icon={<TimelineOutlinedIcon />}>
+                        <NavLink style={({ isActive }) => {
+                            return {
+                                color: isActive ? colors.blueAccent[500] : ""
+                            };
+                        }} to="/study-mode">
+                            <MenuItem icon={<PieChartOutlineOutlinedIcon />}>
+                                Форма обучения
+                            </MenuItem>
+                        </NavLink>
+                        <NavLink style={({ isActive }) => {
+                            return {
+                                color: isActive ? colors.blueAccent[500] : ""
+                            };
+                        }} to="/courses">
+                            <MenuItem icon={<ShowChartOutlinedIcon />}>
+                                Курс обучения
+                            </MenuItem>
+                        </NavLink>
+                        <NavLink style={({ isActive }) => {
+                            return {
+                                color: isActive ? colors.blueAccent[500] : ""
+                            };
+                        }} to="/semesters">
+                            <MenuItem icon={<ShowChartOutlinedIcon />}>
+                                Семестр
+                            </MenuItem>
+                        </NavLink>
                     </SubMenu>
-                    <MenuItem icon={<DescriptionOutlinedIcon />}> Documentation </MenuItem>
-                    <MenuItem icon={<CalendarTodayOutlinedIcon />}> Calendar </MenuItem>
+                    <NavLink style={({ isActive }) => {
+                        return {
+                            color: isActive ? colors.blueAccent[500] : ""
+                        };
+                    }} to="/price-list">
+                        <MenuItem icon={<DescriptionOutlinedIcon />}>
+                            Прайс лист
+                        </MenuItem>
+                    </NavLink>
+                    <NavLink style={({ isActive }) => {
+                        return {
+                            color: isActive ? colors.blueAccent[500] : ""
+                        };
+                    }} to="/calendar">
+                        <MenuItem icon={<CalendarTodayOutlinedIcon />}>
+                            Calendar
+                        </MenuItem>
+                    </NavLink>
                 </Menu>
             </Sidebar>
         </Box>

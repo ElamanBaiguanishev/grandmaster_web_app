@@ -6,7 +6,9 @@ import { FC } from "react";
 
 const MainLayout: FC = () => {
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
+    <Box
+      sx={{ display: "flex" }}
+    >
       <Box
         component="nav"
         sx={{ flexShrink: 0 }}
@@ -18,7 +20,6 @@ const MainLayout: FC = () => {
         sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
       >
         <Topbar />
-        {/* <Toolbar /> */}
         <Box sx={{ flexGrow: 1, p: 2 }}>
           <Outlet />
         </Box>

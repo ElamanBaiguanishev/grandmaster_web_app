@@ -18,7 +18,7 @@ const Topbar: FC = () => {
           </IconButton>
         )}
         <Typography variant="h6">
-          React sidebar with dropdown
+          Грандмастер
         </Typography>
       </Toolbar>
     </AppBar>
