@@ -1,34 +1,71 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Group } from './entities/group.entity';
+import { CreateMultipleGroupsDto } from './dto/create-multiple-groups.dto';
 
 @Injectable()
 export class GroupsService {
   constructor(
     @InjectRepository(Group)
-    private readonly groupRepository: Repository<Group>
+    private readonly groupRepository: Repository<Group>,
   ) { }
 
-  create(createGroupDto: CreateGroupDto) {
-    return 'This action adds a new group';
+  async create(createGroupDto: CreateGroupDto): Promise<Group> {
+    const newGroup = {
+      name: createGroupDto.name,
+      semester: { id: +createGroupDto.semesterId }
+    }
+
+    if (!newGroup) throw new BadRequestException('Somethins went wrong')
+
+    return await this.groupRepository.save(newGroup);
   }
 
-  findAll() {
-    return `This action returns all groups`;
+  async findAll(): Promise<Group[]> {
+    return await this.groupRepository.find({ relations: ['semester'] });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} group`;
+  async findOne(id: number): Promise<Group> {
+    const group = await this.groupRepository.findOne({
+      where: { id },
+      relations: ['semester', 'semester.course', 'semester.course.studyMode'], // Загружаем связанные объекты
+    });
+
+    if (!group) {
+      throw new NotFoundException(`Group with id ${id} not found`);
+    }
+
+    return group;
   }
 
-  update(id: number, updateGroupDto: UpdateGroupDto) {
-    return `This action updates a #${id} group`;
+  async update(id: number, updateGroupDto: UpdateGroupDto): Promise<Group> {
+    const group = await this.findOne(id);
+
+    group.name = updateGroupDto.name;
+    group.semester.id = updateGroupDto.semesterId;
+
+    return await this.groupRepository.save(group);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} group`;
+  async remove(id: number): Promise<void> {
+    const group = await this.findOne(id);
+    await this.groupRepository.remove(group);
   }
+
+  async createMultiple(createMultipleGroupsDto: CreateMultipleGroupsDto): Promise<Group[]> {
+    const { groupNames, semesterId } = createMultipleGroupsDto;
+
+    const newGroups = groupNames.map(name => ({
+      name,
+      semester: { id: semesterId }
+    }));
+
+    if (!newGroups.length) throw new BadRequestException('No groups to create');
+
+    return await this.groupRepository.save(newGroups);
+  }
+
 }
