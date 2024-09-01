@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { Lesson } from './entities/lesson.entity';
@@ -13,23 +13,43 @@ export class LessonsService {
     private readonly lessonRepository: Repository<Lesson>
   ) { }
 
-  create(createLessonDto: CreateLessonDto) {
-    return 'This action adds a new lesson';
+  async create(createLessonDto: CreateLessonDto) {
+    const newLesson = {
+      name: createLessonDto.name,
+      group: { id: +createLessonDto.groupId }
+    }
+
+    if (!newLesson) throw new BadRequestException('Somethins went wrong')
+
+    return await this.lessonRepository.save(newLesson);
   }
 
-  findAll() {
-    return `This action returns all lessons`;
+  async findAll() {
+    return await this.lessonRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} lesson`;
+  async findOne(id: number) {
+    const lesson = await this.lessonRepository.findOne({
+      where: { id },
+      relations: ['group'],
+    });
+    if (!lesson) {
+      throw new NotFoundException(`Lesson with id ${id} not found`);
+    }
+    return lesson;
   }
 
-  update(id: number, updateLessonDto: UpdateLessonDto) {
-    return `This action updates a #${id} lesson`;
+  async update(id: number, updateLessonDto: UpdateLessonDto) {
+    const lesson = await this.findOne(id);
+
+    lesson.name = updateLessonDto.name;
+    lesson.group.id = updateLessonDto.groupId;
+
+    return await this.lessonRepository.save(lesson);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} lesson`;
+  async remove(id: number) {
+    const lesson = await this.findOne(id);
+    await this.lessonRepository.remove(lesson);
   }
 }
