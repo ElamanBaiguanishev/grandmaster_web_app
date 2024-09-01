@@ -1,35 +1,54 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Course } from './entities/course.entity';
 
-
 @Injectable()
 export class CoursesService {
   constructor(
     @InjectRepository(Course)
-    private readonly courseRepository: Repository<Course>
-  ) { }
+    private readonly courseRepository: Repository<Course>,
+  ) {}
 
-  create(createCourseDto: CreateCourseDto) {
-    return 'This action adds a new course';
+  async create(createCourseDto: CreateCourseDto): Promise<Course> {
+    const newCourse = {
+      name: createCourseDto.name,
+      studyMode: { id: +createCourseDto.studyModeId }
+    }
+
+    if (!newCourse) throw new BadRequestException('Somethins went wrong')
+
+    return await this.courseRepository.save(newCourse);
   }
 
-  findAll() {
-    return `This action returns all courses`;
+  async findAll(): Promise<Course[]> {
+    return await this.courseRepository.find({ relations: ['studyMode', 'semesters'] });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} course`;
+  async findOne(id: number): Promise<Course> {
+    const course = await this.courseRepository.findOne({
+      where: { id },
+      relations: ['studyMode', 'semesters'],
+    });
+    if (!course) {
+      throw new NotFoundException(`Course with id ${id} not found`);
+    }
+    return course;
   }
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    return `This action updates a #${id} course`;
+  async update(id: number, updateCourseDto: UpdateCourseDto): Promise<Course> {
+    const course = await this.findOne(id);
+
+    course.name = updateCourseDto.name
+    course.studyMode.id = updateCourseDto.studyModeId
+
+    return await this.courseRepository.save(course);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} course`;
+  async remove(id: number): Promise<void> {
+    const course = await this.findOne(id);
+    await this.courseRepository.remove(course);
   }
 }
