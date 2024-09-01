@@ -11,7 +11,7 @@ import { LessonsModule } from './lessons/lessons.module';
 import { CoursesModule } from './courses/courses.module';
 import { StudyModeModule } from './study_mode/study_mode.module';
 import { AuthModule } from './auth/auth.module';
-
+ 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
