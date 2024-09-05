@@ -105,6 +105,24 @@ const SideBarFC: FC = () => {
                                 Семестр
                             </MenuItem>
                         </NavLink>
+                        <NavLink style={({ isActive }) => {
+                            return {
+                                color: isActive ? colors.blueAccent[500] : ""
+                            };
+                        }} to="/groups">
+                            <MenuItem icon={<ShowChartOutlinedIcon />}>
+                                Группы
+                            </MenuItem>
+                        </NavLink>
+                        <NavLink style={({ isActive }) => {
+                            return {
+                                color: isActive ? colors.blueAccent[500] : ""
+                            };
+                        }} to="/lessons">
+                            <MenuItem icon={<ShowChartOutlinedIcon />}>
+                                Предметы
+                            </MenuItem>
+                        </NavLink>
                     </SubMenu>
                     <NavLink style={({ isActive }) => {
                         return {

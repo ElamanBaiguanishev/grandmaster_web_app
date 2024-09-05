@@ -25,4 +25,5 @@ export interface IStudyMode {
 export interface ILesson {
     id: number
     name: string
+    group: IGroup
 }
