@@ -2,6 +2,7 @@ export interface IGroup {
     id: number
     name: string
     semester: ISemester
+    lessons: ILesson[]
 }
 
 export interface ISemester {
@@ -26,4 +27,12 @@ export interface ILesson {
     id: number
     name: string
     group: IGroup
+    tasks: ITask[]
+}
+
+export interface ITask {
+    id: number;
+    type: string;
+    price: number;
+    lessonId: number;
 }

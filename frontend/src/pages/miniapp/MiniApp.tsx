@@ -1,38 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Button, TextField, Typography, Box, Container } from "@mui/material";
-import api from "../../api/axios.api";
-import { IGroup } from "../../types/group";
+import { useLocation } from "react-router-dom";
+import { Typography, Box, Button, Paper, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
+import { ILesson } from "../../types/group";
 
 const MiniApp: React.FC = () => {
-    const { group_id } = useParams<{ group_id: string }>(); // Извлекаем group_id из URL
-    const [userId, setUserId] = useState<number | null>(null);
-    const [isTelegram, setIsTelegram] = useState<boolean>(false);
+    const location = useLocation();
+    const { lessons, fullName } = location.state as { lessons: ILesson[], fullName: string };
+    const [tg, setTg] = useState<WebApp | null>(null);
     const [fileName, setFileName] = useState<string | null>(null);
-    const [groupData, setGroupData] = useState<IGroup | null>(null); 
 
     useEffect(() => {
-        const fetchGroupData = async () => {
-            try {
-                const response = await api.get(`groups/${group_id}`);  // Выполняем запрос к API
-                setGroupData(response.data);  // Сохраняем полученные данные в состояние
-            } catch (error) {
-                console.error("Ошибка при получении данных о группе:", error);
-            }
-        };
-
-        if (group_id) {
-            fetchGroupData();  // Выполняем запрос, если group_id доступен
-        }
-    }, [group_id]);
-
-    useEffect(() => {
-        const tg = window.Telegram?.WebApp;
-        if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            setIsTelegram(true);
-            setUserId(tg.initDataUnsafe.user.id);
-        } else {
-            setIsTelegram(true);
+        const telegram = window.Telegram?.WebApp;
+        if (telegram) {
+            setTg(telegram);
+            telegram.expand();
         }
     }, []);
 
@@ -45,91 +26,197 @@ const MiniApp: React.FC = () => {
         }
     };
 
+    // Получаем стили Telegram WebApp для динамического изменения темы
+    const backgroundColor = tg?.themeParams?.bg_color || "#ffffff"; // Цвет фона
+    const textColor = tg?.themeParams?.text_color || "#000000"; // Цвет текста
+    const buttonColor = tg?.themeParams?.button_color || "#0088cc"; // Цвет кнопок
+    const buttonTextColor = tg?.themeParams?.button_text_color || "#ffffff"; // Цвет текста на кнопках
+    const tableBackgroundColor = tg?.themeParams?.secondary_bg_color || "#f1f1f1"; // Цвет фона таблицы в зависимости от темы
+    const tableBorderColor = tg?.themeParams?.hint_color || "#dddddd"; // Цвет границы таблицы
+
     return (
-        <Container
-            maxWidth="xs"
+        <Box
             sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                height: "100vh",
-                padding: "16px",
+                padding: "8px",
+                width: "100%",
+                backgroundColor: backgroundColor, // Используем цвет фона из темы Telegram
+                color: textColor,
+                minHeight: "100vh",
             }}
         >
-            {isTelegram ? (
-                <>
-                    <Box sx={{ width: "100%", textAlign: "center" }}>
-                        <img
-                            src="\src\assets\mock_qr.svg"
-                            alt="QR Code"
-                            style={{
-                                width: "100%",
-                                maxWidth: "300px",
-                                height: "auto",
-                            }}
-                        />
-                    </Box>
-                    <Typography variant="h5" gutterBottom>
-                        Заполните форму
-                    </Typography>
-                    <Box
-                        component="form"
-                        sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "16px",
-                            width: "100%",
-                        }}
-                    >
-                        <TextField
-                            label="ФИО"
-                            variant="outlined"
-                            fullWidth
-                        />
-                        <TextField
-                            label="Учебный шифр"
-                            variant="outlined"
-                            fullWidth
-                        />
-                        <Button
-                            variant="contained"
-                            component="label"
-                            fullWidth
-                        >
-                            Приложите файл
-                            <input
-                                type="file"
-                                hidden
-                                onChange={handleFileChange}
-                            />
-                        </Button>
-                        {fileName && (
-                            <Typography variant="body2" sx={{ marginTop: "8px", textAlign: "center" }}>
-                                Выбранный файл: {fileName}
-                            </Typography>
+            <Paper
+                sx={{
+                    width: "100%",
+                    padding: "4px",
+                    marginBottom: "8px",
+                    backgroundColor: tableBackgroundColor, // Цвет фона таблицы
+                    color: textColor,
+                    borderColor: tableBorderColor, 
+                }}
+                elevation={2}
+            >
+                <Typography variant="h6" sx={{ fontSize: "14px", textAlign: "center", color: textColor }}>
+                    Выбранные предметы:
+                </Typography>
+
+                {/* Таблица для отображения предметов и заданий */}
+                <Table
+                    sx={{
+                        width: "100%",
+                        marginTop: "4px",
+                        backgroundColor: tableBackgroundColor, // Цвет фона таблицы
+                        color: textColor,
+                        borderColor: tableBorderColor, // Граница таблицы
+                    }}
+                >
+                    <TableHead>
+                        <TableRow>
+                            <TableCell
+                                sx={{
+                                    fontSize: "12px",
+                                    fontWeight: "bold",
+                                    color: textColor,
+                                    borderBottom: `1px solid ${tableBorderColor}`,
+                                    paddingBottom: "0.5px",
+                                    paddingTop: "0.5px"
+                                }}
+                            >
+                                Предмет
+                            </TableCell>
+                            <TableCell
+                                sx={{
+                                    fontSize: "12px",
+                                    fontWeight: "bold",
+                                    color: textColor,
+                                    borderBottom: `1px solid ${tableBorderColor}`,
+                                    paddingBottom: "0.5px",
+                                    paddingTop: "0.5px"
+                                }}
+                            >
+                                Задание
+                            </TableCell>
+                            <TableCell
+                                sx={{
+                                    fontSize: "12px",
+                                    fontWeight: "bold",
+                                    color: textColor,
+                                    borderBottom: `1px solid ${tableBorderColor}`,
+                                    paddingBottom: "0.5px",
+                                    paddingTop: "0.5px"
+                                }}
+                            >
+                                Цена
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {lessons.map((lesson) =>
+                            lesson.tasks.map((task) => (
+                                <TableRow key={task.id}>
+                                    <TableCell
+                                        sx={{
+                                            fontSize: "12px",
+                                            color: textColor,
+                                            borderBottom: `1px solid ${tableBorderColor}`,
+                                            paddingBottom: "0.5px",
+                                            paddingTop: "0.5px"
+                                        }}
+                                    >
+                                        {lesson.name}
+                                    </TableCell>
+                                    <TableCell
+                                        sx={{
+                                            fontSize: "10px",
+                                            color: textColor,
+                                            borderBottom: `1px solid ${tableBorderColor}`,
+                                            paddingBottom: "0.5px",
+                                            paddingTop: "0.5px"
+                                        }}
+                                    >
+                                        {task.type}
+                                    </TableCell>
+                                    <TableCell
+                                        sx={{
+                                            fontSize: "10px",
+                                            color: textColor,
+                                            borderBottom: `1px solid ${tableBorderColor}`,
+                                            paddingBottom: "0.5px",
+                                            paddingTop: "0.5px"
+                                        }}
+                                    >
+                                        {task.price}
+                                    </TableCell>
+                                </TableRow>
+                            ))
                         )}
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            fullWidth
-                        >
-                            Отправить
-                        </Button>
-                    </Box>
-                    <Typography variant="body2" color="textSecondary" sx={{ marginTop: "16px" }}>
-                        Ваш User ID: {userId}
+                    </TableBody>
+                </Table>
+            </Paper>
+
+            {/* ФИО */}
+            <Typography
+                variant="h6"
+                sx={{ fontSize: "12px", textAlign: "center", marginBottom: "8px", color: textColor }}
+            >
+                Ваше ФИО: {fullName}
+            </Typography>
+
+            {/* QR-код */}
+            <Box sx={{ width: "100%", textAlign: "center", marginBottom: "8px" }}>
+                <img
+                    src="\src\assets\mock_qr.svg"
+                    alt="QR Code"
+                    style={{ width: "80%", maxWidth: "150px", height: "auto" }}
+                />
+            </Box>
+
+            {/* Загрузка файла */}
+            <Box
+                component="form"
+                sx={{ display: "flex", flexDirection: "column", gap: "4px", width: "100%" }}
+            >
+                <Button
+                    variant="contained"
+                    component="label"
+                    fullWidth
+                    sx={{
+                        fontSize: "12px",
+                        padding: "6px",
+                        backgroundColor: buttonColor, // Цвет кнопок
+                        color: buttonTextColor, // Цвет текста на кнопках
+                    }}
+                >
+                    Приложите файл
+                    <input type="file" hidden onChange={handleFileChange} />
+                </Button>
+                {fileName && (
+                    <Typography
+                        variant="body2"
+                        sx={{ fontSize: "10px", textAlign: "center", marginTop: "4px", color: textColor }}
+                    >
+                        Выбранный файл: {fileName}
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" sx={{ marginTop: "16px" }}>
-                        Group Name: {groupData?.semester.name ?? "Загрузка..."}  {/* Добавлена проверка на наличие данных */}
-                    </Typography>
-                </>
-            ) : (
-                <Typography variant="h6" align="center">
-                    Это приложение не открыто через Telegram
+                )}
+                <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    sx={{ fontSize: "12px", padding: "6px" }}
+                >
+                    Отправить
+                </Button>
+            </Box>
+
+            {/* User ID */}
+            {tg && (
+                <Typography
+                    variant="body2"
+                    sx={{ marginTop: "8px", fontSize: "10px", color: textColor }}
+                >
+                    Ваш User ID: {tg!.initDataUnsafe!.user!.id}
                 </Typography>
             )}
-        </Container>
+        </Box>
     );
 };
 

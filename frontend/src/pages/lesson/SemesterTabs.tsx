@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Tabs, Tab, Typography, CircularProgress, Paper } from '@mui/material';
 import { getSemesters } from '../../api/semesterApi';
-import LessonForm from './LessonForm';
 import { ISemester } from '../../types/group';
+import GroupList from './GroupList';
 
 const SemesterTabs: React.FC = () => {
     const [semesters, setSemesters] = useState<ISemester[]>([]);
@@ -51,9 +51,9 @@ const SemesterTabs: React.FC = () => {
 
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-            <Paper sx={{ padding: 2, width: '100%', maxWidth: 1200, overflowX: 'auto' }}>
+            <Paper sx={{ padding: 2, width: '100%', overflowX: 'auto' }}>
                 <Tabs
-                    value={semesters.findIndex(s => s === selectedSemester)}
+                    value={semesters.findIndex(s => s.id === selectedSemester?.id)}
                     onChange={handleTabChange}
                     variant="scrollable"
                     scrollButtons="auto"
@@ -65,7 +65,7 @@ const SemesterTabs: React.FC = () => {
                 </Tabs>
                 <Box mt={2}>
                     {selectedSemester ? (
-                        <LessonForm semesterId={selectedSemester.id} />
+                        <GroupList semesterId={selectedSemester.id} />
                     ) : (
                         <Typography variant="h6">Выберите семестр для отображения групп.</Typography>
                     )}
