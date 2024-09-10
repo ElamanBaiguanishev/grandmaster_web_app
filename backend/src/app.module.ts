@@ -11,10 +11,19 @@ import { LessonsModule } from './lessons/lessons.module';
 import { CoursesModule } from './courses/courses.module';
 import { StudyModeModule } from './study_mode/study_mode.module';
 import { AuthModule } from './auth/auth.module';
- 
+import { TaskModule } from './task/task.module';
+import { ClientsModule } from './clients/clients.module';
+import { OrdersModule } from './orders/orders.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import * as path from 'path'
+import { FilesModule } from './files/files.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ServeStaticModule.forRoot({
+      rootPath: path.resolve(__dirname, 'static'),
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -36,7 +45,11 @@ import { AuthModule } from './auth/auth.module';
     LessonsModule,
     CoursesModule,
     StudyModeModule,
-    AuthModule
+    AuthModule,
+    TaskModule,
+    ClientsModule,
+    OrdersModule,
+    FilesModule
   ],
   controllers: [AppController],
   providers: [AppService],

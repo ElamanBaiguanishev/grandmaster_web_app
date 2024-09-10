@@ -39,6 +39,13 @@ export class LessonsService {
     return lesson;
   }
 
+  async findByGroup(groupId: number): Promise<Lesson[]> {
+    return await this.lessonRepository.find({
+      where: { group: { id: groupId } },
+      // relations: ['semester', 'semester.course', 'semester.course.studyMode']
+    });
+  }
+
   async update(id: number, updateLessonDto: UpdateLessonDto) {
     const lesson = await this.findOne(id);
 

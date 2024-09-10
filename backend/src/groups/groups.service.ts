@@ -31,7 +31,7 @@ export class GroupsService {
   async findOne(id: number): Promise<Group> {
     const group = await this.groupRepository.findOne({
       where: { id },
-      relations: ['semester', 'semester.course', 'semester.course.studyMode'], // Загружаем связанные объекты
+      relations: ['semester', 'semester.course', 'semester.course.studyMode', 'lessons', 'lessons.tasks'], // Загружаем связанные объекты
     });
 
     if (!group) {
@@ -39,6 +39,13 @@ export class GroupsService {
     }
 
     return group;
+  }
+
+  async findBySemester(semesterId: number): Promise<Group[]> {
+    return await this.groupRepository.find({
+      where: { semester: { id: semesterId } },
+      relations: ['semester', 'semester.course', 'semester.course.studyMode', 'lessons'], // Загружаем связанные объекты
+    });
   }
 
   async update(id: number, updateGroupDto: UpdateGroupDto): Promise<Group> {

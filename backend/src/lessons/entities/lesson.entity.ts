@@ -1,5 +1,6 @@
 import { Group } from 'src/groups/entities/group.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Task } from 'src/task/entities/task.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('lessons')
 export class Lesson {
@@ -11,4 +12,7 @@ export class Lesson {
 
     @ManyToOne(() => Group, group => group.lessons)
     group: Group;
+
+    @OneToMany(() => Task, task => task.lesson)
+    tasks: Task[]
 }

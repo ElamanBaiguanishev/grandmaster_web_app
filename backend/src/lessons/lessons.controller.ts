@@ -23,6 +23,11 @@ export class LessonsController {
     return this.lessonsService.findOne(+id);
   }
 
+  @Get('/by-group/:groupId')
+  findBySemester(@Param('groupId') groupId: string) {
+    return this.lessonsService.findByGroup(+groupId);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto) {
     return this.lessonsService.update(+id, updateLessonDto);

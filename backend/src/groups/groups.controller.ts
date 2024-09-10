@@ -29,6 +29,11 @@ export class GroupsController {
     return this.groupsService.findOne(+id);
   }
 
+  @Get('/by-semester/:semesterId')
+  findBySemester(@Param('semesterId') semesterId: string) {
+    return this.groupsService.findBySemester(+semesterId);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {
     return this.groupsService.update(+id, updateGroupDto);
