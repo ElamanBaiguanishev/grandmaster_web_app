@@ -5,16 +5,23 @@ import PriceList from "../pages/price-list/PriceList";
 import StudyModeList from "../pages/study-mode/StudyModeList";
 import CourseList from "../pages/course/CourseList";
 import SemesterList from "../pages/semester/SemesterList";
-import Choise from "../pages/miniapp/Choise";
-import GroupForm from "../pages/group/GroupForm";
+// import Choise from "../pages/miniapp/Choise";
+import GroupWithSemesterTabs from "../pages/group/GroupWithSemesterTabs";
 import SemesterTabs from "../pages/lesson/SemesterTabs";
-import MiniApp from "../pages/miniapp/MiniApp";
+import MiniApp from "../pages/miniapp/legacy/MiniApp";
+import MiniAppLayout from "../pages/miniapp/MiniAppLayout";
+import MiniAppChoise from "../pages/miniapp/MiniAppChoise";
+import MiniApp404 from "../pages/miniapp/MiniApp404";
+import MiniAppTable from "../pages/miniapp/MiniAppTable";
+import MiniAppFio from "../pages/miniapp/MiniAppFio";
+import MiniAppQR from "../pages/miniapp/MiniAppQR";
+import MiniAppAtachFile from "../pages/miniapp/MiniAppAtachFile";
 
 export const router = createBrowserRouter([
     {
         path: '/',
         element: <MainLayout />,
-        // errorElement: <ErrorPage />,
+        // errorElement: <MiniApp404 />,
         children: [
             {
                 index: true,
@@ -38,7 +45,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'groups',
-                element: <GroupForm />
+                element: <GroupWithSemesterTabs />
             },
             {
                 path: 'lessons',
@@ -47,8 +54,31 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        path: 'miniapp/:group_id',
-        element: <Choise />
+        path: '/miniapp',
+        element: <MiniAppLayout />,
+        errorElement: <MiniApp404 />,
+        children: [
+            {
+                path: ':group_id',
+                element: <MiniAppChoise />,
+            },
+            {
+                path: ':group_id/:choise',
+                element: <MiniAppTable />,
+            },
+            {
+                path: "fio",
+                element: <MiniAppFio />
+            },
+            {
+                path: 'qr',
+                element: <MiniAppQR />
+            },
+            {
+                path: 'final',
+                element: <MiniAppAtachFile />
+            }
+        ]
     },
     {
         path: 'order',

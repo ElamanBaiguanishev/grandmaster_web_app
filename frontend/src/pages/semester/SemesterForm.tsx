@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { TextField, Button, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-import { getCourses } from '../../api/courseApi'; // API-запрос для получения курсов
-import { ICourse, ISemester } from '../../types/group'; // Убедитесь, что типы корректны
+import { getCourses } from '../../api/courseApi';
 import { createSemester, updateSemester } from '../../api/semesterApi';
+import { ICourse } from '../../types/course';
+import { ISemester } from '../../types/semester';
 
 interface SemesterFormProps {
   semester?: ISemester | null;
@@ -74,7 +75,7 @@ const SemesterForm: React.FC<SemesterFormProps> = ({ semester, onClose }) => {
           required
           margin="normal"
         />
-        
+
         <FormControl fullWidth margin="normal" required>
           <InputLabel>Курс</InputLabel>
           <Select

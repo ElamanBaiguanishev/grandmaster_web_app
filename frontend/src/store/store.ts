@@ -1,11 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit'
 import userReduser from "./user/userSlice"
 import sidebarReducer from "./sidebar/sidebarSlice"
+import tgReducer from "./telegram/tgSlice"
+import themeReducer from "./theme/themeSlice"
 
 export const store = configureStore({
     reducer: {
         sidebar: sidebarReducer,
-        user: userReduser
+        user: userReduser,
+        tg: tgReducer,
+        theme: themeReducer
     },
 })
 
