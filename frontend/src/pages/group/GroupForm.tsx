@@ -1,70 +1,97 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Tabs, Tab, Typography, CircularProgress, Paper } from '@mui/material';
-import { getSemesters } from '../../api/semesterApi'; // API-запрос для получения семестров
-import { ISemester } from '../../types/group';
-import GroupTable from './GroupTable';
+import { TextField, Button, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { IGroup } from '../../types/group/group';
+import { ISemester } from '../../types/semester/semester';
+import { GroupService } from '../../api/group.service';
+import { IGroupPayloadData } from '../../types/group/group.payload';
+import { SemesterService } from '../../api/semester.service';
 
-const GroupForm: React.FC = () => {
-    const [semesters, setSemesters] = useState<ISemester[]>([]);
-    const [selectedSemester, setSelectedSemester] = useState<ISemester | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+interface GroupFormProps {
+  group?: IGroup | null;
+  onClose: () => void;
+}
 
-    useEffect(() => {
-        const fetchSemesters = async () => {
-            try {
-                const data = await getSemesters(); // Получаем список семестров
-                setSemesters(data);
-                setSelectedSemester(data[0]); // Устанавливаем первый семестр как выбранный по умолчанию
-            } catch (error) {
-                setError('Ошибка при получении данных о семестрах.');
-                console.error("Ошибка при получении данных о семестрах:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+const GroupForm: React.FC<GroupFormProps> = ({ group, onClose }) => {
+  const [name, setName] = useState(group?.name || '');
+  const [semesterId, setSemesterId] = useState<number | ''>(group?.semester?.id || '');
+  const [semesters, setSemesters] = useState<ISemester[]>([]);
 
-        fetchSemesters();
-    }, []);
+  const isEditMode = Boolean(group?.id);
 
-    const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-        setSelectedSemester(semesters[newValue]);
+  useEffect(() => {
+    const fetchSemesters = async () => {
+      try {
+        const data = await SemesterService.getSemesters();
+        setSemesters(data);
+      } catch (error) {
+        console.error('Error fetching semesters:', error);
+      }
     };
 
-    if (loading) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-                <CircularProgress />
-            </Box>
-        );
+    fetchSemesters();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (semesterId === '') {
+      console.error('Semester is required');
+      return;
     }
 
-    if (error) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-                <Typography variant="h6" color="error">
-                    {error}
-                </Typography>
-            </Box>
-        );
-    }
+    const groupData: IGroupPayloadData = {
+      name,
+      semesterId
+    };
 
-    return (
-        <Paper sx={{ padding: 2 }}>
-            <Tabs value={semesters.findIndex(s => s === selectedSemester)} onChange={handleTabChange}>
-                {semesters.map((semester, _) => (
-                    <Tab key={semester.id} label={semester.name} />
-                ))}
-            </Tabs>
-            <Box mt={2}>
-                {selectedSemester ? (
-                    <GroupTable semesterId={selectedSemester.id} />
-                ) : (
-                    <Typography variant="h6">Выберите семестр для отображения групп.</Typography>
-                )}
-            </Box>
-        </Paper>
-    );
+    try {
+      if (isEditMode) {
+        await GroupService.updateGroup(group!.id, groupData);
+      } else {
+        await GroupService.createGroup(groupData);
+      }
+      onClose(); // Закрываем форму после успешного сохранения
+    } catch (error) {
+      console.error('Error saving group:', error);
+    }
+  };
+
+  return (
+    <Paper sx={{ padding: 1 }}>
+      <form onSubmit={handleSubmit}>
+        <TextField
+          label="Название группы"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          fullWidth
+          required
+          margin="normal"
+        />
+
+        <FormControl fullWidth margin="normal" required>
+          <InputLabel>Семестр</InputLabel>
+          <Select
+            value={semesterId}
+            onChange={(e) => setSemesterId(e.target.value as number)}
+            label="Семестр"
+          >
+            {semesters.map((semester) => (
+              <MenuItem key={semester.id} value={semester.id}>
+                {semester.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <Button variant="contained" color="primary" type="submit" sx={{ marginRight: 1 }}>
+          {isEditMode ? 'Обновить' : 'Создать'}
+        </Button>
+        <Button variant="outlined" color="secondary" onClick={onClose}>
+          Отмена
+        </Button>
+      </form>
+    </Paper>
+  );
 };
 
 export default GroupForm;

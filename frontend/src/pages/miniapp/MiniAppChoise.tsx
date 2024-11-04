@@ -1,13 +1,16 @@
 import { Box, Button, Grid, Typography } from '@mui/material';
 import { FC, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { setType } from '../../store/telegram/tgSlice';
 
 const MiniAppChoice: FC = () => {
     const telegram = useAppSelector((state) => state.tg.tg);
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         if (telegram) {
+            telegram.BackButton.hide();
             telegram.MainButton.hide();
         }
     }, [telegram]);
@@ -15,16 +18,21 @@ const MiniAppChoice: FC = () => {
     return (
         <Box
             sx={{
-                padding: "16px",
+                padding: "0px",
             }}
         >
             {/* Заголовок */}
             <Typography
-                variant="h6"
+                variant="h1"
                 sx={{
                     textAlign: "center",
-                    marginBottom: "16px",
-                    fontWeight: "bold",
+                    padding: 0,
+                    margin: 0,
+                    lineHeight: '33.3552px',
+                    fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+                    fontWeight: '500',
+                    fontSize: "19px",
+                    marginBottom: '15px'
                 }}
             >
                 Выберите, что Вы хотите заказать
@@ -32,9 +40,9 @@ const MiniAppChoice: FC = () => {
 
             <Grid
                 container
-                spacing={4}
+                spacing={2}
                 sx={{
-                    padding: 2,
+                    // padding: 2,
                 }}
             >
                 <Grid item xs={6}>
@@ -51,7 +59,9 @@ const MiniAppChoice: FC = () => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             textAlign: 'center',
+                            borderRadius: '16px'
                         }}
+                        onClick={()=> {dispatch(setType('Вся сессия'))}}
                     >
                         Вся сессия
                     </Button>
@@ -70,7 +80,9 @@ const MiniAppChoice: FC = () => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             textAlign: 'center',
+                            borderRadius: '16px'
                         }}
+                        onClick={()=> {dispatch(setType('Все контрольные'))}}
                     >
                         Только все контрольные
                     </Button>
@@ -88,7 +100,9 @@ const MiniAppChoice: FC = () => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             textAlign: 'center',
+                            borderRadius: '16px'
                         }}
+                        onClick={()=> {dispatch(setType('Все экзамены'))}}
                     >
                         Только все экзамены
                     </Button>
@@ -106,7 +120,9 @@ const MiniAppChoice: FC = () => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             textAlign: 'center',
+                            borderRadius: '16px'
                         }}
+                        onClick={()=> {dispatch(setType('Часть предметов'))}}
                     >
                         Часть предметов
                     </Button>

@@ -1,9 +1,11 @@
 // src/components/Course/CourseForm.tsx
 import React, { useEffect, useState } from 'react';
 import { TextField, Button, Paper, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { createCourse, updateCourse } from '../../api/courseApi';
-import { ICourse, IStudyMode } from '../../types/group';
-import { getStudyModes } from '../../api/studyModeApi';
+import { IStudyMode } from '../../types/study-mode/study-mode';
+import { ICourse } from '../../types/course/course';
+import { ICoursePayloadData } from '../../types/course/course.payload';
+import { CourseService } from '../../api/course.service';
+import { StudyModeService } from '../../api/study.service';
 
 interface CourseFormProps {
     course?: ICourse | null;
@@ -20,7 +22,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onClose }) => {
     useEffect(() => {
         const fetchStudyModes = async () => {
             try {
-                const data = await getStudyModes();
+                const data = await StudyModeService.getStudyModes();
                 setStudyModes(data);
             } catch (error) {
                 console.error('Error fetching study modes:', error);
@@ -39,16 +41,16 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onClose }) => {
             return;
         }
 
-        const courseData = {
+        const courseData: ICoursePayloadData = {
             name,
             studyModeId, // Добавление обязательного поля
         };
 
         try {
             if (isEditMode) {
-                await updateCourse(course!.id, courseData);
+                await CourseService.updateCourse(course!.id, courseData);
             } else {
-                await createCourse(courseData);
+                await CourseService.createCourse(courseData);
             }
             onClose(); // Закрываем форму после успешного сохранения
         } catch (error) {
@@ -57,7 +59,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onClose }) => {
     };
 
     return (
-        <Paper sx={{ padding: 2, marginTop: 2 }}>
+        <Paper sx={{ padding: 1 }}>
             <form onSubmit={handleSubmit}>
                 <TextField
                     label="Название курса"
@@ -73,6 +75,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onClose }) => {
                     <Select
                         value={studyModeId}
                         onChange={(e) => setStudyModeId(e.target.value as number)}
+                        label="Режим обучения"
                     >
                         {studyModes.map((mode) => (
                             <MenuItem key={mode.id} value={mode.id}>

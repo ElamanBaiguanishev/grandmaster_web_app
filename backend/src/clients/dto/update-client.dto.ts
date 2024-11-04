@@ -7,5 +7,5 @@ export class UpdateClientDto {
 
   @IsString()
   @IsOptional()
-  groupId?: number;  // ID группы, если клиент привязан к группе
+  groupName: string;
 }

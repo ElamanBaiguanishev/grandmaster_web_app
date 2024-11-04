@@ -1,8 +1,8 @@
 // src/components/StudyMode/StudyModeForm.tsx
 import React, { useState } from 'react';
 import { TextField, Button, Paper } from '@mui/material';
-import { createStudyMode, updateStudyMode } from '../../api/studyModeApi';
-import { IStudyMode } from '../../types/group';
+import { IStudyMode } from '../../types/study-mode/study-mode';
+import { StudyModeService } from '../../api/study.service';
 
 interface StudyModeFormProps {
     studyMode?: IStudyMode | null;
@@ -18,9 +18,9 @@ const StudyModeForm: React.FC<StudyModeFormProps> = ({ studyMode, onClose }) => 
         e.preventDefault();
         try {
             if (isEditMode) {
-                await updateStudyMode(studyMode!.id, { name });
+                await StudyModeService.updateStudyMode(studyMode!.id, { name });
             } else {
-                await createStudyMode({ name });
+                await StudyModeService.createStudyMode({ name });
             }
             onClose(); // Закрываем форму после успешного сохранения
         } catch (error) {
@@ -29,7 +29,7 @@ const StudyModeForm: React.FC<StudyModeFormProps> = ({ studyMode, onClose }) => 
     };
 
     return (
-        <Paper sx={{ padding: 2, marginTop: 2 }}>
+        <Paper sx={{ padding: 1 }}>
             <form onSubmit={handleSubmit}>
                 <TextField
                     label="Название режима обучения"
@@ -39,7 +39,11 @@ const StudyModeForm: React.FC<StudyModeFormProps> = ({ studyMode, onClose }) => 
                     required
                     margin="normal"
                 />
-                <Button variant="contained" color="primary" type="submit" sx={{ marginRight: 1 }}>
+                <Button variant="contained" color="primary" type="submit"
+                    sx={{
+                        marginRight: 1
+                    }}
+                >
                     {isEditMode ? 'Обновить' : 'Создать'}
                 </Button>
                 <Button variant="outlined" color="secondary" onClick={onClose}>

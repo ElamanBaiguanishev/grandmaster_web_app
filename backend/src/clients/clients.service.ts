@@ -3,7 +3,7 @@ import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Client } from './entities/client.entity';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 
 @Injectable()
 export class ClientsService {
@@ -14,9 +14,10 @@ export class ClientsService {
 
   async create(createClientDto: CreateClientDto): Promise<Client> {
     const newClient = {
-      id: createClientDto.id,
+      cipher: createClientDto.cipher,
       name: createClientDto.name,
-      group: { id: createClientDto.groupId }
+      group: createClientDto.group,
+      client: { id: createClientDto.semesterId }
     }
 
     if (!newClient) throw new BadRequestException('Somethins went wrong')
@@ -24,18 +25,39 @@ export class ClientsService {
     return await this.clientRepository.save(newClient);
   }
 
-  async findAll(): Promise<Client[]> {
-    return await this.clientRepository.find({ relations: ['group'] });
+  async createMany(createClientsDto: CreateClientDto[]): Promise<Client[]> {
+    const clients = createClientsDto.map(dto => ({
+      cipher: dto.cipher,
+      name: dto.name,
+      groupName: dto.group,
+      semester: { id: 2 }
+    }));
+
+    if (!clients.length) throw new BadRequestException('No clients provided');
+
+    return await this.clientRepository.save(clients);
   }
 
-  async findOne(id: string): Promise<Client> {
+  async searchByFio(fio: string): Promise<Client[]> {
+    // Выполняем поиск клиентов, чьи имена содержат введенную строку
+    return await this.clientRepository.find({
+      where: { name: Like(`%${fio}%`) }, // Используем LIKE для частичного поиска
+      relations: ['orders'], // Загрузка связанных заказов
+    });
+  }
+
+  async findAll(): Promise<Client[]> {
+    return await this.clientRepository.find({ relations: ['orders', 'semester'] });
+  }
+
+  async findOne(cipher: string): Promise<Client> {
     const client = await this.clientRepository.findOne({
-      where: { id },
-      relations: ['group'],
+      where: { cipher },
+      relations: ['orders'],
     });
 
     if (!client) {
-      throw new NotFoundException(`Client with id ${id} not found`);
+      throw new NotFoundException(`Client with cipher ${cipher} not found`);
     }
 
     return client;
@@ -45,7 +67,7 @@ export class ClientsService {
     const client = await this.findOne(id);
 
     client.name = updateClientDto.name;
-    client.group.id = updateClientDto.groupId;
+    client.groupName = updateClientDto.groupName;
 
     return await this.clientRepository.save(client);
   }

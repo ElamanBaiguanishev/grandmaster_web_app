@@ -1,9 +1,9 @@
 import { FC, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { Box, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { setLessons, setPrice } from '../../store/telegram/tgSlice';
-import { ILesson } from '../../types/lesson';
+import { ILesson } from '../../types/lesson/lesson';
 import { filterLessons } from './tools';
 
 const tableCellStyle = () => ({
@@ -38,7 +38,7 @@ const MiniAppTable: FC = () => {
         setLesson(filteredLessons);
 
         const totalPrice = filteredLessons.reduce((acc, lesson) => {
-          const taskPriceSum = lesson.tasks.reduce((taskAcc, task) => {
+          const taskPriceSum = lesson.tasks!.reduce((taskAcc, task) => {
             return +taskAcc + +task.price;
           }, 0);
           return acc + taskPriceSum;
@@ -53,51 +53,53 @@ const MiniAppTable: FC = () => {
       telegram.MainButton.show();
       telegram.MainButton.setText("Продолжить");
       telegram.MainButton.enable();
-      telegram.MainButton.color = "#FF0000";
+      telegram.MainButton.color = "#3CB043";
       telegram.MainButton.textColor = "#FFFFFF";
 
       const handleClick = () => {
         if (filtLessons) {
           dispatch(setLessons(filtLessons));
         }
+
         if (totalPrice) {
-          dispatch(setPrice(totalPrice))
+          dispatch(setPrice(totalPrice));
         }
+
         navigate('/miniapp/fio');
+      };
+
+      const backClick = () => {
+        navigate("/miniapp/:group_id");
       }
+
 
       telegram.MainButton.onClick(handleClick);
 
-      telegram.BackButton.onClick(() => {
-        navigate("/miniapp/:group_id");
+      telegram.BackButton.onClick(backClick);
+
+      const today = new Date();
+      const formattedDate = today.toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       });
+      setCurrentDate(formattedDate);
 
       return () => {
         if (telegram) {
-          telegram.BackButton.hide();
-          telegram.MainButton.hide();
+          // telegram.BackButton.hide();
+          // telegram.MainButton.hide();
+          telegram.BackButton.offClick(backClick);
           telegram.MainButton.offClick(handleClick);
         }
       };
     }
-
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString('ru-RU', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-    setCurrentDate(formattedDate); // Устанавливаем дату в стейт
-
-
   }, [group, choise, telegram, navigate, dispatch, totalPrice]);
 
   if (!filtLessons) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center">
-        <Typography variant="h6" color="error">
-          В РАЗРАБОТКЕ
-        </Typography>
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress />
       </Box>
     );
   }
@@ -109,16 +111,15 @@ const MiniAppTable: FC = () => {
         sx={{
           textAlign: "center",
           marginBottom: "16px",
-          // fontWeight: "bold",
         }}
       >
         Это все предметы Вашей сессии, установленные преподавателем на{' '}
         <Box
           component="span"
           sx={{
-            color: 'red', // Выделение цветом
-            fontWeight: 'bold',   // Жирный шрифт
-            fontSize: '1.1em',    // Увеличенный размер шрифта
+            color: '#3CB043',
+            fontWeight: 'bold',
+            fontSize: '1.1em',
           }}
         >
           {currentDate}
@@ -157,7 +158,7 @@ const MiniAppTable: FC = () => {
           </TableHead>
           <TableBody>
             {filtLessons.map((lesson) =>
-              lesson.tasks.map((task) => (
+              lesson.tasks!.map((task) => (
                 <TableRow key={task.id}>
                   <TableCell sx={tableRowCellStyle()}>
                     {lesson.name}
@@ -166,20 +167,25 @@ const MiniAppTable: FC = () => {
                     {task.type}
                   </TableCell>
                   <TableCell sx={tableRowCellStyle()}>
-                    {task.price}
+                    {task.price} ₽
                   </TableCell>
                 </TableRow>
               ))
             )}
             <TableRow>
-              <TableCell colSpan={2} sx={tableRowCellStyle()}>
+              <TableCell colSpan={2} sx={{
+                borderBottom: `1px solid`,
+                paddingBottom: "5px",
+                paddingTop: "5px",
+                fontWeight: 'bold',
+                fontSize: '1.1em',
+              }} >
                 Общая сумма:
               </TableCell>
               <TableCell sx={tableRowCellStyle()}>
                 <Box component='span' sx={{
-                  color: 'red', // Выделение цветом
-                  fontWeight: 'bold',   // Жирный шрифт
-                  fontSize: '1.1em',    // Увеличенный размер шрифта
+                  fontWeight: 'bold',
+                  fontSize: '1.1em',
                 }}>{totalPrice.toFixed(2)} ₽</Box>
               </TableCell>
             </TableRow>

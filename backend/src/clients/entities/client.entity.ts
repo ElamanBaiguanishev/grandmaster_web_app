@@ -1,18 +1,39 @@
-import { Entity, PrimaryColumn, Column, OneToMany, ManyToOne } from 'typeorm';
-import { Group } from 'src/groups/entities/group.entity';
-import { Order } from 'src/orders/entities/order.entity';  // Импорт Order
+import { Entity, PrimaryColumn, Column, OneToMany, ManyToOne, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Order } from 'src/orders/entities/order.entity';
+import { SemesterByYear } from 'src/semesters-by-year/entities/semesters-by-year.entity';
 
 @Entity('clients')
 export class Client {
-    @PrimaryColumn({ type: 'varchar', length: 255 })
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    cipher: string
 
     @Column()
     name: string;
+    
+    @Column()
+    groupName: string;
 
-    @ManyToOne(() => Group, group => group.clients)
-    group: Group;
+    @Column({ nullable: true })
+    phoneNumber: string;
+
+    @Column({ nullable: true })
+    login: string;
+
+    @Column({ nullable: true })
+    password: string;
+
+    @ManyToOne(() => SemesterByYear, semester => semester.clients)
+    semester: SemesterByYear;
 
     @OneToMany(() => Order, order => order.client)
     orders: Order[];
+
+    @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
 }

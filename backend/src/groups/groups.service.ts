@@ -5,9 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Group } from './entities/group.entity';
 import { CreateMultipleGroupsDto } from './dto/create-multiple-groups.dto';
+import { UpdateVisibilityDto } from './dto/visible.dto';
 
 @Injectable()
 export class GroupsService {
+
   constructor(
     @InjectRepository(Group)
     private readonly groupRepository: Repository<Group>,
@@ -25,7 +27,7 @@ export class GroupsService {
   }
 
   async findAll(): Promise<Group[]> {
-    return await this.groupRepository.find({ relations: ['semester'] });
+    return await this.groupRepository.find({ relations: ['semester', 'semester.course', 'semester.course.studyMode', 'lessons'] });
   }
 
   async findOne(id: number): Promise<Group> {
@@ -44,7 +46,7 @@ export class GroupsService {
   async findBySemester(semesterId: number): Promise<Group[]> {
     return await this.groupRepository.find({
       where: { semester: { id: semesterId } },
-      relations: ['semester', 'semester.course', 'semester.course.studyMode', 'lessons'], // Загружаем связанные объекты
+      relations: ['semester', 'semester.course', 'semester.course.studyMode', 'lessons'],
     });
   }
 
@@ -53,6 +55,14 @@ export class GroupsService {
 
     group.name = updateGroupDto.name;
     group.semester.id = updateGroupDto.semesterId;
+
+    return await this.groupRepository.save(group);
+  }
+
+  async updateVisible(id: number, updateVisibilityDto: UpdateVisibilityDto) {
+    const group = await this.findOne(id);
+
+    group.isVisible = updateVisibilityDto.isVisible;
 
     return await this.groupRepository.save(group);
   }

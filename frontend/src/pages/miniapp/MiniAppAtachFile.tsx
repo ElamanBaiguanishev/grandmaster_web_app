@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button } from '@mui/material';
 import { setFile } from '../../store/telegram/tgSlice';
-import api from '../../api/axios.api';
+import api from '../../api';
 
 const MiniAppAtachFile: FC = () => {
     const telegram = useAppSelector((state) => state.tg.tg);
@@ -15,7 +15,7 @@ const MiniAppAtachFile: FC = () => {
     const enableButton = () => {
         if (telegram) {
             telegram.MainButton.enable();
-            telegram.MainButton.color = "#FF0000";
+            telegram.MainButton.color = "#3CB043";
             telegram.MainButton.textColor = "#FFFFFF";
         }
     };
@@ -34,20 +34,28 @@ const MiniAppAtachFile: FC = () => {
 
             const price = stateTg.price?.toFixed(2);
             const telegram_user_id = stateTg.tg?.initDataUnsafe?.user?.id.toString();
+            const telegram_nickname = stateTg.tg?.initDataUnsafe?.user?.username;
             const file = stateTg.file;
             const fio = stateTg.fio;
-            const group_id = stateTg.group?.id.toString();
+            const group = stateTg.group?.name.toString();
+            const semester = stateTg.group?.semester?.name.toString();
+            const course = stateTg.group?.semester?.course?.name.toString();
+            const type = stateTg.type?.toString();
 
-            if (!price || !telegram_user_id || !file || !fio || !group_id) {
+            if (!price || !telegram_user_id || !telegram_nickname || !file || !fio || !group || !type || !semester || !course) {
                 alert('One or more fields are missing');
                 return false;
             }
 
             formData.append("price", price);
             formData.append("telegram_user_id", telegram_user_id);
+            formData.append("telegram_nickname", telegram_nickname);
             formData.append("image", file);
             formData.append("fio", fio);
-            formData.append("group_id", group_id);
+            formData.append("group", group);
+            formData.append("semester", semester);
+            formData.append("course", course);
+            formData.append("type", type);
 
             if (stateTg.lessons) {
                 formData.append("lessons", JSON.stringify(stateTg.lessons));
@@ -55,7 +63,7 @@ const MiniAppAtachFile: FC = () => {
 
             await api.post('/orders/', formData);
 
-            alert('Заказ успешно оформлен');
+            alert('Ваш заказ успешно завершен! В случае необходимости с вами свяжется наш менеджер');
 
             return true
         } catch (error: any) {
@@ -63,7 +71,7 @@ const MiniAppAtachFile: FC = () => {
                 alert('Ошибка 400: ' + JSON.stringify(error.response.data));
                 return false
             } else {
-                alert('Ошибка при загрузке файла: ' + error.message);
+                alert('Ошибка: ' + error.message);
                 return false
             }
         }
@@ -73,7 +81,7 @@ const MiniAppAtachFile: FC = () => {
         if (telegram) {
             telegram.BackButton.show();
             telegram.MainButton.show();
-            telegram.MainButton.setText("Завершить");
+            telegram.MainButton.setText("ЗАВЕРШИТЬ ЗАКАЗ");
 
             const handleClick = async () => {
                 if (uploadedFile) {
@@ -92,14 +100,17 @@ const MiniAppAtachFile: FC = () => {
 
             telegram.MainButton.onClick(handleClick);
 
-            telegram.BackButton.onClick(() => {
+            const backClick = () => {
                 navigate('/miniapp/qr');
-            });
+            }
+
+            telegram.BackButton.onClick(backClick);
 
             return () => {
                 if (telegram) {
-                    telegram.BackButton.hide();
-                    telegram.MainButton.hide();
+                    // telegram.BackButton.hide();
+                    // telegram.MainButton.hide();
+                    telegram.BackButton.offClick(backClick)
                     telegram.MainButton.offClick(handleClick);
                 }
             };
@@ -123,7 +134,7 @@ const MiniAppAtachFile: FC = () => {
                     marginBottom: "16px",
                 }}
             >
-                Приложите файл и нажмите кнопку завершить
+                Приложите чек оплаты и нажмите кнопку «ЗАВЕРШИТЬ ЗАКАЗ»
             </Typography>
 
             <Button
@@ -131,7 +142,7 @@ const MiniAppAtachFile: FC = () => {
                 component="label"
                 fullWidth
             >
-                Загрузить файл
+                Приложить чек оплаты
                 <input
                     type="file"
                     hidden

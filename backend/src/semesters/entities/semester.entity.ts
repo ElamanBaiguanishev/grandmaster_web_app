@@ -1,7 +1,7 @@
 // semester.entity.ts
 import { Course } from 'src/courses/entities/course.entity';
 import { Group } from 'src/groups/entities/group.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('semesters')
 export class Semester {
@@ -16,4 +16,10 @@ export class Semester {
 
     @OneToMany(() => Group, group => group.semester)
     groups: Group[];
+
+    @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
 }

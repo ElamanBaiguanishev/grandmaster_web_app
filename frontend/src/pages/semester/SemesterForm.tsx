@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { TextField, Button, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-import { getCourses } from '../../api/courseApi';
-import { createSemester, updateSemester } from '../../api/semesterApi';
-import { ICourse } from '../../types/course';
-import { ISemester } from '../../types/semester';
+import { CourseService } from '../../api/course.service';
+import { ICourse } from '../../types/course/course';
+import { ISemester } from '../../types/semester/semester';
+import { SemesterService } from '../../api/semester.service';
+import { ISemesterPayloadData } from '../../types/semester/semester.payload';
 
 interface SemesterFormProps {
   semester?: ISemester | null;
@@ -20,7 +21,7 @@ const SemesterForm: React.FC<SemesterFormProps> = ({ semester, onClose }) => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const data = await getCourses();
+        const data = await CourseService.getCourses();
         setCourses(data);
       } catch (error) {
         console.error('Error fetching courses:', error);
@@ -39,24 +40,16 @@ const SemesterForm: React.FC<SemesterFormProps> = ({ semester, onClose }) => {
       return;
     }
 
-    // Поиск выбранного курса по ID
-    const selectedCourse = courses.find(course => course.id === courseId);
-
-    if (!selectedCourse) {
-      console.error('Selected course not found');
-      return;
-    }
-
-    const semesterData: Omit<ISemester, 'id'> = {
+    const semesterData: ISemesterPayloadData = {
       name,
-      course: selectedCourse  // Передаем полный объект курса
+      courseId
     };
 
     try {
       if (isEditMode) {
-        await updateSemester(semester!.id, semesterData);
+        await SemesterService.updateSemester(semester!.id, semesterData);
       } else {
-        await createSemester(semesterData);
+        await SemesterService.createSemester(semesterData);
       }
       onClose(); // Закрываем форму после успешного сохранения
     } catch (error) {
@@ -65,7 +58,7 @@ const SemesterForm: React.FC<SemesterFormProps> = ({ semester, onClose }) => {
   };
 
   return (
-    <Paper sx={{ padding: 2, marginTop: 2 }}>
+    <Paper sx={{ padding: 1 }}>
       <form onSubmit={handleSubmit}>
         <TextField
           label="Название семестра"
@@ -81,6 +74,7 @@ const SemesterForm: React.FC<SemesterFormProps> = ({ semester, onClose }) => {
           <Select
             value={courseId}
             onChange={(e) => setCourseId(e.target.value as number)}
+            label="Курс"
           >
             {courses.map((course) => (
               <MenuItem key={course.id} value={course.id}>

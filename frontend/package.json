@@ -12,9 +12,14 @@
   "dependencies": {
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
+    "@mui/x-date-pickers": "^7.18.0",
     "@reduxjs/toolkit": "^2.2.7",
     "@types/telegram-web-app": "^7.8.0",
+    "@vkruglikov/react-telegram-web-app": "^2.1.9",
     "axios": "^1.7.5",
+    "dayjs": "^1.11.13",
+    "ka-table": "^11.1.1",
+    "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-pro-sidebar": "^1.1.0",
@@ -23,6 +28,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "@types/lodash": "^4.17.7",
+    "@types/node": "^22.7.6",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",

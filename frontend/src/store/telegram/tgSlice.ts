@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
-import { IGroup } from '../../types/group'
-import { ILesson } from '../../types/lesson'
+import { IGroup } from '../../types/group/group'
+import { ILesson } from '../../types/lesson/lesson'
 
 interface TgState {
     tg: WebApp | null
@@ -10,6 +10,7 @@ interface TgState {
     fio: string | null
     price: number | null,
     file: File | null,
+    type: string | null
 }
 
 const initialState: TgState = {
@@ -18,7 +19,8 @@ const initialState: TgState = {
     lessons: null,
     fio: null,
     price: null,
-    file: null
+    file: null,
+    type: null
 }
 
 export const tgSlice = createSlice({
@@ -43,10 +45,13 @@ export const tgSlice = createSlice({
         setFile: (state, action: PayloadAction<File>) => {
             state.file = action.payload
         },
+        setType: (state, action: PayloadAction<string>) => {
+            state.type = action.payload
+        },
     },
 })
 
-export const { setTg, setGroup, setLessons, setfio, setPrice, setFile } = tgSlice.actions
+export const { setTg, setGroup, setLessons, setfio, setPrice, setFile, setType } = tgSlice.actions
 
 export const selectCount = (state: RootState) => state.tg
 

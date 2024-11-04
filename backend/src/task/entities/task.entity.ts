@@ -1,5 +1,5 @@
 import { Lesson } from 'src/lessons/entities/lesson.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('tasks')
 export class Task {
@@ -14,4 +14,10 @@ export class Task {
 
     @ManyToOne(() => Lesson, lesson => lesson.tasks)
     lesson: Lesson;
+
+    @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
 }

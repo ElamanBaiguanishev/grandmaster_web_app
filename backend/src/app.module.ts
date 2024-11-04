@@ -15,14 +15,17 @@ import { TaskModule } from './task/task.module';
 import { ClientsModule } from './clients/clients.module';
 import { OrdersModule } from './orders/orders.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import * as path from 'path'
 import { FilesModule } from './files/files.module';
+import { join } from 'path';
+import { SemestersByYearModule } from './semesters-by-year/semesters-by-year.module';
+import { YearModule } from './year/year.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ServeStaticModule.forRoot({
-      rootPath: path.resolve(__dirname, 'static'),
+      rootPath: join(__dirname, '..', 'static'),
+      serveRoot: '/api'
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -49,7 +52,9 @@ import { FilesModule } from './files/files.module';
     TaskModule,
     ClientsModule,
     OrdersModule,
-    FilesModule
+    FilesModule,
+    SemestersByYearModule,
+    YearModule
   ],
   controllers: [AppController],
   providers: [AppService],

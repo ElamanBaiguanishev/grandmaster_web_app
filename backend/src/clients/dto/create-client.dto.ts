@@ -1,10 +1,9 @@
-// create-client.dto.ts
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, IsOptional } from 'class-validator';
 
 export class CreateClientDto {
   @IsString()
   @IsNotEmpty()
-  id: string;  // текстовый шифр для клиента
+  cipher: string;
 
   @IsString()
   @IsNotEmpty()
@@ -12,5 +11,21 @@ export class CreateClientDto {
 
   @IsString()
   @IsNotEmpty()
-  groupId: number;  // ID группы, если клиент привязан к группе
+  group: string;
+
+  @IsInt()
+  @IsNotEmpty()
+  semesterId: number;
+
+  @IsInt()
+  @IsOptional()
+  phoneNumber: number;
+
+  @IsString()
+  @IsOptional()
+  login: string;
+
+  @IsString()
+  @IsOptional()
+  password: string;
 }

@@ -2,10 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { Task } from './entities/task.entity';
+import { CreateTaskWithSemesterGroupDto } from './dto/create-withSemesterGroup.dto';
 
 @Controller('tasks')
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(private readonly taskService: TaskService) { }
 
   @Post()
   create(@Body() createTaskDto: CreateTaskDto) {
@@ -26,6 +28,17 @@ export class TaskController {
   findBySemester(@Param('lessonId') lessonId: string) {
     return this.taskService.findByLesson(+lessonId);
   }
+
+  @Post('by-ids')
+  getTasksByIds(@Body('taskIds') taskIds: number[]): Promise<Task[]> {
+    return this.taskService.findByIds(taskIds);
+  }
+
+  @Post('many')
+  createMany(@Body() createTasksDto: CreateTaskWithSemesterGroupDto[]): Promise<Task[]> {
+    return this.taskService.createWithSemesterGroup(createTasksDto);
+  }
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {

@@ -1,6 +1,6 @@
 import { Semester } from 'src/semesters/entities/semester.entity';
 import { StudyMode } from 'src/study_mode/entities/study_mode.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('courses')
 export class Course {
@@ -15,4 +15,10 @@ export class Course {
 
     @OneToMany(() => Semester, semester => semester.course)
     semesters: Semester[];
+
+    @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
 }

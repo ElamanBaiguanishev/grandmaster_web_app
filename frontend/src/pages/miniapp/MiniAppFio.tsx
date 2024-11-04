@@ -14,7 +14,7 @@ const MiniAppFio: FC = () => {
     const enableButton = () => {
         if (telegram) {
             telegram.MainButton.enable();
-            telegram.MainButton.color = "#FF0000"; // Зеленый цвет кнопки, когда она активна
+            telegram.MainButton.color = "#3CB043"; // Зеленый цвет кнопки, когда она активна
             telegram.MainButton.textColor = "#FFFFFF"; // Белый цвет текста
         }
     };
@@ -41,19 +41,22 @@ const MiniAppFio: FC = () => {
 
             const handleClick = () => {
                 dispatch(setfio(fullName));
-                navigate('/miniapp/qr');
+                navigate('/miniapp/payment');
+            }
+
+            const backClick = () => {
+                navigate("/miniapp/:group_id");
             }
 
             telegram.MainButton.onClick(handleClick);
 
-            telegram.BackButton.onClick(() => {
-                navigate("/miniapp/:group_id");
-            });
+            telegram.BackButton.onClick(backClick);
 
             return () => {
                 if (telegram) {
-                    telegram.BackButton.hide();
-                    telegram.MainButton.hide();
+                    // telegram.BackButton.hide();
+                    // telegram.MainButton.hide();
+                    telegram.MainButton.offClick(backClick)
                     telegram.MainButton.offClick(handleClick);
                 }
             };

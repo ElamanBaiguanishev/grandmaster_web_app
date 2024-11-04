@@ -2,7 +2,6 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateSemesterDto } from './dto/create-semester.dto';
 import { UpdateSemesterDto } from './dto/update-semester.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StudyMode } from 'src/study_mode/entities/study_mode.entity';
 import { Repository } from 'typeorm';
 import { Semester } from './entities/semester.entity';
 
@@ -24,8 +23,20 @@ export class SemestersService {
     return await this.semesterRepository.save(newSemester);
   }
 
+  async allSemNames(): Promise<string[]> {
+    const semesters = await this.semesterRepository.find();
+    return semesters.map(semester => semester.name);
+  }
+
   async findAll() {
-    return await this.semesterRepository.find({ relations: ['course', 'groups'] });
+    return await this.semesterRepository.find({
+      relations: [
+        'course',
+        'groups',
+        'groups.lessons',
+        'groups.lessons.tasks'
+      ],
+    });
   }
 
   async findOne(id: number) {

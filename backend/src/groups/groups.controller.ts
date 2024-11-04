@@ -3,6 +3,7 @@ import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { CreateMultipleGroupsDto } from './dto/create-multiple-groups.dto';
+import { UpdateVisibilityDto } from './dto/visible.dto';
 
 @UsePipes(ValidationPipe)
 @Controller('groups')
@@ -37,6 +38,11 @@ export class GroupsController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {
     return this.groupsService.update(+id, updateGroupDto);
+  }
+
+  @Patch('visible/:id')
+  updateVisible(@Param('id') id: string, @Body() updateVisibilityDto: UpdateVisibilityDto) {
+    return this.groupsService.updateVisible(+id, updateVisibilityDto);
   }
 
   @Delete(':id')

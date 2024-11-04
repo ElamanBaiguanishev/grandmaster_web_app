@@ -1,6 +1,6 @@
-import { IGroup } from "../../types/group";
-import { ITask } from "../../types/task";
-import { ILesson } from "../../types/lesson";
+import { IGroup } from "../../types/group/group";
+import { ITask } from "../../types/task/task";
+import { ILesson } from "../../types/lesson/lesson";
 
 export function filterLessons(group: IGroup | null, selectedOption: string): ILesson[] | null {
     if (!group) return null;
@@ -12,13 +12,13 @@ export function filterLessons(group: IGroup | null, selectedOption: string): ILe
         case "allkr":
             return group.lessons.map(lesson => ({
                 ...lesson,
-                tasks: lesson.tasks.filter((task: ITask) => task.type.trim().toLowerCase() !== "экзамен") // Возвращает уроки с заданиями, исключая экзамены
+                tasks: lesson.tasks!.filter((task: ITask) => task.type.trim().toLowerCase() !== "экзамен") // Возвращает уроки с заданиями, исключая экзамены
             }));
 
         case "allexam":
             return group.lessons.map(lesson => ({
                 ...lesson,
-                tasks: lesson.tasks.filter((task: ITask) => {
+                tasks: lesson.tasks!.filter((task: ITask) => {
                     const taskTypeNormalized = task.type.trim().toLowerCase();
                     return taskTypeNormalized === "экзамен"; // Возвращает уроки только с заданиями типа "экзамен"
                 }),

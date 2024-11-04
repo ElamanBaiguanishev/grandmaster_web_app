@@ -1,7 +1,7 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsArray, IsInt } from 'class-validator';
-import { Lesson } from 'src/lessons/entities/lesson.entity';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateOrderDto {
+    @IsString()
     @IsNotEmpty()
     price: string;
 
@@ -11,11 +11,24 @@ export class CreateOrderDto {
 
     @IsString()
     @IsNotEmpty()
+    telegram_nickname: string;
+
+    @IsString()
+    @IsNotEmpty()
     fio: string;
 
     @IsNotEmpty()
-    group_id: string;
+    course: string;
 
-    @IsOptional()
-    lessons: string;  // Массив уроков, если нужно
+    @IsNotEmpty()
+    semester: string;
+
+    @IsNotEmpty()
+    group: string;
+
+    // @IsNotEmpty()
+    type: string;
+
+    @IsNotEmpty()
+    lessons: string;
 }
