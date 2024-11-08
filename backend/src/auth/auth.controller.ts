@@ -1,15 +1,16 @@
-import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { LoginDto } from './dto/login.dto';
 
+@UsePipes(ValidationPipe)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
   @Post('/login')
-  login(@Body() userDto: CreateUserDto) {
-    console.log("login")
+  login(@Body() userDto: LoginDto) {
     return this.authService.login(userDto)
   }
 

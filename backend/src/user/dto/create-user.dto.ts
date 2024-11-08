@@ -1,17 +1,20 @@
-import { IsInt, IsNotEmpty } from "class-validator";
-import { CreateRoleDto } from "src/role/dto/create-role.dto"
+import { IsEmail, IsInt, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateUserDto {
     @IsNotEmpty()
+    @IsString()
+    @IsEmail({}, { message: 'Некорректный email' })
     email: string
 
     @IsNotEmpty()
+    @IsString()
     password: string
 
     @IsNotEmpty()
+    @IsString()
     username: string
 
-    @IsInt()
     @IsNotEmpty()
+    @IsInt()
     roleId: number;
 }

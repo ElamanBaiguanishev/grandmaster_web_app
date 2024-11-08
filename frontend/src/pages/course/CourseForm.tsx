@@ -6,6 +6,7 @@ import { ICourse } from '../../types/course/course';
 import { ICoursePayloadData } from '../../types/course/course.payload';
 import { CourseService } from '../../api/course.service';
 import { StudyModeService } from '../../api/study.service';
+import { toast } from 'react-toastify';
 
 interface CourseFormProps {
     course?: ICourse | null;
@@ -24,8 +25,9 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onClose }) => {
             try {
                 const data = await StudyModeService.getStudyModes();
                 setStudyModes(data);
-            } catch (error) {
-                console.error('Error fetching study modes:', error);
+            } catch (err: any) {
+                const error = err.response?.data.message;
+                toast.error(error.toString());
             }
         };
 
@@ -36,25 +38,27 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onClose }) => {
         e.preventDefault();
 
         if (studyModeId === '') {
-            // Обработка ошибки: studyModeId должен быть выбран
-            console.error('Study mode is required');
+            toast.warning('Форма обучения должен быть выбран');
             return;
         }
 
         const courseData: ICoursePayloadData = {
             name,
-            studyModeId, // Добавление обязательного поля
+            studyModeId
         };
 
         try {
             if (isEditMode) {
                 await CourseService.updateCourse(course!.id, courseData);
+                toast.success('Курс успешно обновлен');
             } else {
                 await CourseService.createCourse(courseData);
+                toast.success('Курс успешно добавлен');
             }
             onClose(); // Закрываем форму после успешного сохранения
-        } catch (error) {
-            console.error('Error saving course:', error);
+        } catch (err: any) {
+            const error = err.response?.data.message;
+            toast.error(error.toString());
         }
     };
 

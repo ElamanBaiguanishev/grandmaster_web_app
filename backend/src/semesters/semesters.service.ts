@@ -32,10 +32,20 @@ export class SemestersService {
     return await this.semesterRepository.find({
       relations: [
         'course',
+        'course.studyMode',
         'groups',
         'groups.lessons',
         'groups.lessons.tasks'
       ],
+      order: {
+        course: {
+          studyMode: {
+            name: 'ASC'
+          },
+          name: 'ASC'
+        },
+        name: 'ASC'
+      },
     });
   }
 

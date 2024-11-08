@@ -3,7 +3,7 @@ import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Client } from './entities/client.entity';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, ILike } from 'typeorm';
 
 @Injectable()
 export class ClientsService {
@@ -41,7 +41,7 @@ export class ClientsService {
   async searchByFio(fio: string): Promise<Client[]> {
     // Выполняем поиск клиентов, чьи имена содержат введенную строку
     return await this.clientRepository.find({
-      where: { name: Like(`%${fio}%`) }, // Используем LIKE для частичного поиска
+      where: { name: ILike(`%${fio}%`) }, // Используем LIKE для частичного поиска
       relations: ['orders'], // Загрузка связанных заказов
     });
   }

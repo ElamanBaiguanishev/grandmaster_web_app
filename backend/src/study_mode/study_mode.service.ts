@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateStudyModeDto } from './dto/create-study_mode.dto';
 import { UpdateStudyModeDto } from './dto/update-study_mode.dto';
 import { StudyMode } from './entities/study_mode.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 
 @Injectable()
 export class StudyModeService {
@@ -37,6 +37,13 @@ export class StudyModeService {
 
   async remove(id: number): Promise<void> {
     const studyMode = await this.findOne(id);
-    await this.studyModeRepository.remove(studyMode);
+    try {
+      await this.studyModeRepository.remove(studyMode);
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        throw new BadRequestException('Невозможно удалить запись, так как она используется в других сущностях.');
+      }
+      throw error;
+    }
   }
 }

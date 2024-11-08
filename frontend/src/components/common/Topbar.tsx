@@ -13,6 +13,7 @@ import { removeTokenFromLocalStorage } from "../../helpers/localstorage.helper";
 import { logout } from "../../store/user/userSlice";
 import { setYearToLocalStorage, getYearFromLocalStorage } from "../../helpers/localstorage.helper";
 import { YearService } from "../../api/year.service";
+import { toast } from "react-toastify";
 
 const Topbar: FC = () => {
   const dispatch = useDispatch();
@@ -21,7 +22,7 @@ const Topbar: FC = () => {
   const navigate = useNavigate();
   const userName = useAppSelector((state) => state.user.user!);
 
-  const [year, setYear] = useState<string>('2024'); // по умолчанию 2024
+  const [year, setYear] = useState<string>('2024/25'); // по умолчанию 2024
   const [years, setYears] = useState<string[]>([]); // добавляем состояние для списка годов
 
   useEffect(() => {
@@ -29,7 +30,7 @@ const Topbar: FC = () => {
     if (storedYear) {
       setYear(storedYear);
     } else {
-      setYearToLocalStorage('2024');
+      setYearToLocalStorage('2024/25');
     }
 
     // Получаем список годов с сервера
@@ -37,8 +38,9 @@ const Topbar: FC = () => {
       try {
         const data = await YearService.getYears();
         setYears(data.map(yearObj => yearObj.name)); // предполагаем, что объект года имеет поле `year`
-      } catch (error) {
-        console.error("Error fetching years:", error);
+      } catch (err: any) {
+        const error = err.response?.data.message;
+        toast.error(error.toString())
       }
     };
 
@@ -55,6 +57,7 @@ const Topbar: FC = () => {
     dispatch(logout());
     removeTokenFromLocalStorage('token');
     navigate('/auth');
+    toast.success('Вы вышли из системы.');
   };
 
   return (
@@ -73,7 +76,7 @@ const Topbar: FC = () => {
         <Select
           value={year}
           onChange={handleYearChange}
-          sx={{ marginLeft: 'auto', marginRight: 2, color: 'inherit' }} // добавляем стили для выравнивания
+          sx={{ marginLeft: 'auto', marginRight: 2, color: 'inherit' }}
         >
           {years.map((yearOption) => (
             <MenuItem key={yearOption} value={yearOption}>

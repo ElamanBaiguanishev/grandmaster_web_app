@@ -12,9 +12,6 @@ export class RolesGuard implements CanActivate {
   constructor(private jwtService: JwtService, private reflector: Reflector) { }
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-
-    // console.log('Я дошел до гуарда')
-
     const req = context.switchToHttp().getRequest();
     try {
       const requiredRoles = this.reflector.getAllAndOverride<RoleTypes[]>(ROLES_KEY, [
@@ -23,7 +20,6 @@ export class RolesGuard implements CanActivate {
       ]);
 
       if (!requiredRoles) {
-        // console.log('Первое условие')
         return true;
       }
 
@@ -35,25 +31,21 @@ export class RolesGuard implements CanActivate {
       const [bearer, token] = authHeader.split(' ');
 
       if (bearer !== 'Bearer' || !token) {
+        // console.log(token)
         throw new UnauthorizedException({ message: 'Пользователь не авторизован' });
       }
-
-      // console.log('Пользователь авторизован')
 
       const user: PayloadUser = this.jwtService.verify(token);
       req.user = user;
 
       const currentYear = req.headers['current-year'];
-      
+
       if (!currentYear) {
         throw new HttpException('Год не предоставлен', HttpStatus.BAD_REQUEST);
       }
       req.year = currentYear;
 
-      // console.log(req.user)
-
-      // Проверка, соответствует ли роль пользователя требуемым ролям
-      return requiredRoles.includes(user.role.type); // Роль приходит как строка
+      return requiredRoles.includes(user.role.type);
     } catch (e) {
       console.log(e);
       throw new HttpException('Нет доступа', HttpStatus.FORBIDDEN);

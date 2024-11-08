@@ -5,6 +5,7 @@ import { ICourse } from '../../types/course/course';
 import { ISemester } from '../../types/semester/semester';
 import { SemesterService } from '../../api/semester.service';
 import { ISemesterPayloadData } from '../../types/semester/semester.payload';
+import { toast } from 'react-toastify';
 
 interface SemesterFormProps {
   semester?: ISemester | null;
@@ -23,8 +24,9 @@ const SemesterForm: React.FC<SemesterFormProps> = ({ semester, onClose }) => {
       try {
         const data = await CourseService.getCourses();
         setCourses(data);
-      } catch (error) {
-        console.error('Error fetching courses:', error);
+      } catch (err: any) {
+        const error = err.response?.data.message;
+        toast.error(error.toString());
       }
     };
 
@@ -36,7 +38,7 @@ const SemesterForm: React.FC<SemesterFormProps> = ({ semester, onClose }) => {
 
     if (courseId === '') {
       // Обработка ошибки: courseId должен быть выбран
-      console.error('Course is required');
+      toast.warning('Курс должен быть выбран');
       return;
     }
 
@@ -48,12 +50,15 @@ const SemesterForm: React.FC<SemesterFormProps> = ({ semester, onClose }) => {
     try {
       if (isEditMode) {
         await SemesterService.updateSemester(semester!.id, semesterData);
+        toast.success('Семестр успешно обновлен');
       } else {
         await SemesterService.createSemester(semesterData);
+        toast.success('Семестр успешно добавлен');
       }
       onClose(); // Закрываем форму после успешного сохранения
-    } catch (error) {
-      console.error('Error saving semester:', error);
+    } catch (err: any) {
+      const error = err.response?.data.message;
+      toast.error(error.toString());
     }
   };
 
@@ -78,7 +83,7 @@ const SemesterForm: React.FC<SemesterFormProps> = ({ semester, onClose }) => {
           >
             {courses.map((course) => (
               <MenuItem key={course.id} value={course.id}>
-                {course.name}
+                {course.name} - {course.studyMode.name}
               </MenuItem>
             ))}
           </Select>

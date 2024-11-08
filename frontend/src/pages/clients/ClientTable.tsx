@@ -4,6 +4,7 @@ import { FilteringMode, SortDirection, SortingMode } from 'ka-table/enums';
 import { Button, TextField } from '@mui/material';
 import { ClientService } from '../../api/client.service';
 import { IClient } from '../../types/client/client';
+import { toast } from 'react-toastify';
 
 const ClientTable: FC = () => {
     const [clients, setClients] = useState<IClient[]>([]);
@@ -15,8 +16,9 @@ const ClientTable: FC = () => {
             try {
                 const data = await ClientService.getClients();
                 setClients(data);
-            } catch (error) {
-                console.error('Ошибка при загрузке клиентов:', error);
+            } catch (err: any) {
+                const error = err.response?.data.message;
+                toast.error(error.toString())
             } finally {
                 setLoading(false);
             }

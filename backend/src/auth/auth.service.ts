@@ -6,6 +6,7 @@ import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { Role } from 'src/role/entities/role.entity';
 import { PayloadUser } from './PayloadUser';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,8 +15,7 @@ export class AuthService {
     private readonly userService: UserService,
   ) { }
 
-  async login(userDto: CreateUserDto) {
-    console.log("login service")
+  async login(userDto: LoginDto) {
     const user = await this.validateUser(userDto)
     return this.generateToken(user)
   }
@@ -47,19 +47,14 @@ export class AuthService {
     };
   }
 
-  private async validateUser(userDto: CreateUserDto) {
-    console.log("validateUser")
+  private async validateUser(userDto: LoginDto) {
     const user = await this.userService.getUserByEmail(userDto.email);
-    console.log(user)
 
-    if (!user) {
-      throw new UnauthorizedException({ message: 'Некорректный email' });
-    }
+    // Проверка пароля одновременно с проверкой существования пользователя
+    const isValidUser = user && await bcrypt.compare(userDto.password, user.password);
 
-    const passwordEquals = await bcrypt.compare(userDto.password, user.password);
-
-    if (!passwordEquals) {
-      throw new UnauthorizedException({ message: 'Некорректный пароль' });
+    if (!isValidUser) {
+      throw new UnauthorizedException({ message: 'Некорректные учетные данные' });
     }
 
     return user;

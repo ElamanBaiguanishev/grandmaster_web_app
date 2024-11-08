@@ -98,7 +98,7 @@ const GroupTable: React.FC<GroupTableProps> = ({ semesterId }) => {
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>Название группы</TableCell>
-              <TableCell>isVisible</TableCell>
+              <TableCell>Показвать в боте</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

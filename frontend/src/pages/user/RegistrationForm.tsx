@@ -4,6 +4,7 @@ import { IRole } from '../../types/role/role';
 import { AuthService } from '../../api/auth.service';
 import { IUserRegPayloadData } from '../../types/user/user.payload';
 import { RoleService } from '../../api/role.service';
+import { toast } from 'react-toastify';
 
 const RegistrationPage: FC = () => {
   const [email, setEmail] = useState('');
@@ -22,7 +23,7 @@ const RegistrationPage: FC = () => {
 
   const handleRegister = async () => {
     if (!email || !username || !password || !roleId) {
-      alert('Пожалуйста, заполните все поля!');
+      toast.warning('Пожалуйста, заполните все поля!')
       return;
     }
 
@@ -33,13 +34,12 @@ const RegistrationPage: FC = () => {
       roleId
     };
 
-    console.log(userData);
-
     try {
       await AuthService.registration(userData);
-      alert('Регистрация успешна!');
-    } catch (error) {
-      console.error('Ошибка регистрации:', error);
+      toast.success('Регистрация успешна!');
+    } catch (err: any) {
+      const error = err.response?.data.message;
+      toast.error(error.toString())
     }
   };
 
@@ -54,6 +54,7 @@ const RegistrationPage: FC = () => {
         variant="outlined"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        required
         fullWidth
       />
       <TextField
@@ -63,6 +64,7 @@ const RegistrationPage: FC = () => {
         variant="outlined"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
+        required
         fullWidth
       />
       <TextField
@@ -73,6 +75,7 @@ const RegistrationPage: FC = () => {
         variant="outlined"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        required
         fullWidth
       />
 

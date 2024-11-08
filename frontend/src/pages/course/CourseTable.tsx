@@ -1,4 +1,3 @@
-// src/components/Course/CourseList.tsx
 import React, { useEffect, useState } from 'react';
 import {
     Table,
@@ -10,16 +9,24 @@ import {
     Paper,
     Button,
     IconButton,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle
 } from '@mui/material';
 import { Delete, Edit, Add } from '@mui/icons-material';
 import CourseForm from './CourseForm';
 import { ICourse } from '../../types/course/course';
 import { CourseService } from '../../api/course.service';
+import { toast } from 'react-toastify';
 
 const CourseTable: React.FC = () => {
     const [courses, setCourses] = useState<ICourse[]>([]);
     const [selectedCourse, setSelectedCourse] = useState<ICourse | null>(null);
     const [isFormVisible, setIsFormVisible] = useState<boolean>(false);
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+    const [courseToDelete, setCourseToDelete] = useState<number | null>(null);
 
     useEffect(() => {
         fetchCourses();
@@ -29,18 +36,30 @@ const CourseTable: React.FC = () => {
         try {
             const data = await CourseService.getCourses();
             setCourses(data);
-        } catch (error) {
-            console.error('Error fetching courses:', error);
+        } catch (err: any) {
+            const error = err.response?.data.message;
+            toast.error(error.toString());
         }
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async () => {
+        if (courseToDelete === null) return;
+
         try {
-            await CourseService.deleteCourse(id);
-            setCourses(courses.filter((course) => course.id !== id));
-        } catch (error) {
-            console.error('Error deleting course:', error);
+            await CourseService.deleteCourse(courseToDelete);
+            setCourses(courses.filter((course) => course.id !== courseToDelete));
+            setIsDialogOpen(false);
+            setCourseToDelete(null);
+            toast.success('Курс успешно удалён');
+        } catch (err: any) {
+            const error = err.response?.data.message;
+            toast.error(error.toString());
         }
+    };
+
+    const handleDeleteClick = (id: number) => {
+        setCourseToDelete(id);
+        setIsDialogOpen(true);
     };
 
     const handleAddClick = () => {
@@ -57,6 +76,11 @@ const CourseTable: React.FC = () => {
         setIsFormVisible(false);
         setSelectedCourse(null);
         fetchCourses();
+    };
+
+    const handleDialogClose = () => {
+        setIsDialogOpen(false);
+        setCourseToDelete(null);
     };
 
     return (
@@ -89,7 +113,7 @@ const CourseTable: React.FC = () => {
                                     <IconButton color="primary" onClick={() => handleEditClick(course)}>
                                         <Edit />
                                     </IconButton>
-                                    <IconButton color="secondary" onClick={() => handleDelete(course.id)}>
+                                    <IconButton color="secondary" onClick={() => handleDeleteClick(course.id)}>
                                         <Delete />
                                     </IconButton>
                                 </TableCell>
@@ -98,6 +122,27 @@ const CourseTable: React.FC = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            {/* Диалоговое окно подтверждения */}
+            <Dialog
+                open={isDialogOpen}
+                onClose={handleDialogClose}
+            >
+                <DialogTitle>Подтверждение удаления</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Вы уверены, что хотите удалить этот курс? Это действие нельзя отменить.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDialogClose} color="primary">
+                        Отмена
+                    </Button>
+                    <Button onClick={handleDelete} color="secondary">
+                        Удалить
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Paper>
     );
 };

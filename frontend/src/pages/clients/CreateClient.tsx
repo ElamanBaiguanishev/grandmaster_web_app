@@ -4,6 +4,8 @@ import { ISemesterByYear } from "../../types/semester/semesterByYear";
 import { ClientService } from "../../api/client.service";
 import { IClientPayloadData } from "../../types/client/client.payload";
 import { SemesterByYearService } from "../../api/semesterYear.service";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CreateClient: React.FC = () => {
     const [clientData, setClientData] = useState<IClientPayloadData>({
@@ -26,6 +28,7 @@ const CreateClient: React.FC = () => {
                 setSemesters(semestersData);
             } catch (error) {
                 console.error("Error fetching semesters:", error);
+                toast.error("Ошибка при загрузке семестров");
             }
         };
 
@@ -52,10 +55,9 @@ const CreateClient: React.FC = () => {
         setLoading(true);
         try {
             await ClientService.createClient(clientData);
-            alert("Клиент успешно создан");
+            toast.success("Клиент успешно создан");
         } catch (error) {
-            console.error("Ошибка при создании клиента:", error);
-            alert("Ошибка при создании клиента");
+            toast.error(`Ошибка при создании клиента ${error}`);
         } finally {
             setLoading(false);
         }

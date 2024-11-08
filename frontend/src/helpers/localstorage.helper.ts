@@ -1,7 +1,11 @@
 // Переписать на классы, с наследованием базовго класса с 3 методами как ниже, а потом уже его расшаривать под нужды
 
+// import { toast } from "react-toastify";
+
 export function getTokenFromLocalStorage(): string {
     const data = localStorage.getItem('token');
+
+    // toast.success(data)
 
     if (data) {
         try {

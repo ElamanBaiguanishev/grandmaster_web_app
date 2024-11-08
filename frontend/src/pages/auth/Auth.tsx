@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { AuthService } from "../../api/auth.service";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
 import { IUserPayloadData } from "../../types/user/user.payload";
+import { toast } from "react-toastify"
+
 
 const Auth: FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -24,11 +26,12 @@ const Auth: FC = () => {
             if (data) {
                 setTokenToLocalStorage('token', data.token);
                 dispatch(login(data));
+                toast.success('Вы успешно вошли в систему.');
                 navigate('/');
             }
         } catch (err: any) {
             const error = err.response?.data.message;
-            console.log(error.toString());
+            toast.error(error.toString())
         }
     };
 
